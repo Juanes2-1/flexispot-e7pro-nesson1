@@ -2,9 +2,9 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-// ======= WiFi設定 =======
-const char* ssid     = "YOUR_SSID";       // ← 自宅WiFiのSSIDに変更
-const char* password = "YOUR_PASSWORD";   // ← 自宅WiFiのパスワードに変更
+// ======= WiFi configuration =======
+const char* ssid     = "YOUR_SSID";       // Your Wi-Fi SSID
+const char* password = "YOUR_PASSWORD";   // Your Wi-Fi password
 
 WebServer server(80);
 
@@ -13,40 +13,40 @@ WebServer server(80);
 // D3 (GPI06) will be No.4(DisplayPin20) of e2pro
 // see https://github.com/iMicknl/LoctekMotion_IoT/tree/main
 
-char lastResult[6] = "";   // 直前に表示した値（"1.95" など）を保存
+char lastResult[6] = "";   // Stores the last displayed value (e.g. "1.95")
 
-// --- Up/Down 連続送信用 ---
+// --- Continuous Up/Down command sending ---
 bool upActive = false;
 bool downActive = false;
 unsigned long lastUpSend = 0;
 unsigned long lastDownSend = 0;
-const unsigned long CMD_INTERVAL_MS = 108;   // 約108msごとに送信
+const unsigned long CMD_INTERVAL_MS = 108;   // Send command every ~108ms
 
 // Supported Commands
-const byte cmd_wakeup[] = {0x9b, 0x06, 0x02, 0x00, 0x00, 0x6c, 0xa1, 0x9d};
-const byte cmd_up[] = {0x9b, 0x06, 0x02, 0x01, 0x00, 0xfc, 0xa0, 0x9d};
-const byte cmd_dwn[] = {0x9b, 0x06, 0x02, 0x02, 0x00, 0x0c, 0xa0, 0x9d};
-const byte cmd_pre1[] = {0x9b, 0x06, 0x02, 0x04, 0x00, 0xac, 0xa3, 0x9d};
-const byte cmd_pre2[] = {0x9b, 0x06, 0x02, 0x08, 0x00, 0xac, 0xa6, 0x9d};
-const byte cmd_pre3[] = {0x9b, 0x06, 0x02, 0x10, 0x00, 0xac, 0xac, 0x9d}; // stand
-const byte cmd_mem[] = {0x9b, 0x06, 0x02, 0x20, 0x00, 0xac, 0xb8, 0x9d};
-const byte cmd_pre4[] = {0x9b, 0x06, 0x02, 0x00, 0x01, 0xac, 0x60, 0x9d}; // sit
+const byte cmd_wakeup[]   = {0x9b, 0x06, 0x02, 0x00, 0x00, 0x6c, 0xa1, 0x9d};
+const byte cmd_up[]       = {0x9b, 0x06, 0x02, 0x01, 0x00, 0xfc, 0xa0, 0x9d};
+const byte cmd_dwn[]      = {0x9b, 0x06, 0x02, 0x02, 0x00, 0x0c, 0xa0, 0x9d};
+const byte cmd_pre1[]     = {0x9b, 0x06, 0x02, 0x04, 0x00, 0xac, 0xa3, 0x9d};
+const byte cmd_pre2[]     = {0x9b, 0x06, 0x02, 0x08, 0x00, 0xac, 0xa6, 0x9d};
+const byte cmd_pre3[]     = {0x9b, 0x06, 0x02, 0x10, 0x00, 0xac, 0xac, 0x9d}; // stand
+const byte cmd_mem[]      = {0x9b, 0x06, 0x02, 0x20, 0x00, 0xac, 0xb8, 0x9d};
+const byte cmd_pre4[]     = {0x9b, 0x06, 0x02, 0x00, 0x01, 0xac, 0x60, 0x9d}; // sit
 const byte cmd_alarmoff[] = {0x9b, 0x06, 0x02, 0x40, 0x00, 0xaC, 0x90, 0x9d};
 const byte cmd_childlock[] = {0x9b, 0x06, 0x02, 0x20, 0x00, 0xac, 0xb8, 0x9d};
 
 // Status Protocol
-// 0 byte 0x9b: Start Command
-const uint8_t START_BYTE  = 0x9B;  // フレーム開始
-// 1 byte 0xXX: Command Length
-// 2 byte 0x12: Height Stream 
-const uint8_t CMD_DISPLAY = 0x12;  // 7セグ表示, 以降は高さ表示のフォーマット
-const uint8_t CMD_SLEEP = 0x13;  // スリープ
-// 3 byte 0xXX: First Digit (8 Segment) / Reverse Bit
-// 4 byte 0xXX: Second Digit (8 Segment) / Reverse Bit
-// 5 byte 0xXX: Third Digit (8 Segment) / Reverse Bit
-// 6 byte 0xXX: 16bit Modbus-CRC16 Checksum 1
-// 7 byte 0xXX: 16bit Modbus-CRC16 Checksum 2
-// 8 byte 0x9b: End of Command
+// byte 0: 0x9b: Start Command
+const uint8_t START_BYTE  = 0x9B;  // Frame start
+// byte 1: 0xXX: Command Length
+// byte 2: 0x12: Height Stream 
+const uint8_t CMD_DISPLAY = 0x12;  // 7-seg display, height format
+const uint8_t CMD_SLEEP   = 0x13;  // Sleep
+// byte 3: 0xXX: First Digit (8 Segment) / Reverse Bit
+// byte 4: 0xXX: Second Digit (8 Segment) / Reverse Bit
+// byte 5: 0xXX: Third Digit (8 Segment) / Reverse Bit
+// byte 6: 0xXX: 16bit Modbus-CRC16 Checksum 1
+// byte 7: 0xXX: 16bit Modbus-CRC16 Checksum 2
+// byte 8: 0x9b: End of Command
 
 enum RecvState {
   WAIT_START,
@@ -57,7 +57,7 @@ enum RecvState {
 RecvState state = WAIT_START;
 
 uint8_t frameLen = 0;
-const uint8_t MAX_FRAME_LEN = 32;  // 必要に応じて増やす
+const uint8_t MAX_FRAME_LEN = 32;  // Increase if needed
 uint8_t frameBuf[MAX_FRAME_LEN];
 uint8_t frameIndex = 0;
 
@@ -65,8 +65,8 @@ uint8_t frameIndex = 0;
 // Commands //
 //////////////
 void turnon() {
-  // Turn desk in operating mode by setting controller DisplayPin20 to HIGH
-  Serial.println("Sending Turn on Command");
+  // Put desk in operating mode by setting controller DisplayPin20 to HIGH
+  Serial.println("Sending Turn On Command");
   digitalWrite(D3, HIGH);
   delay(1000);
   digitalWrite(D3, LOW);
@@ -132,11 +132,11 @@ void pre4() {
   Serial1.write(cmd_pre4, sizeof(cmd_pre4));
 }
 
-// ====== HTTPハンドラ ======
+// ====== HTTP handlers ======
 void handleRoot() {
   String html = R"rawliteral(
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Flexispot Web Controller</title>
@@ -150,7 +150,7 @@ void handleRoot() {
     margin-bottom: 10px;
   }
 
-  /* 上段：高さ + Wakeup */
+  /* Top row: height + Wakeup */
   .top-row {
     display: flex;
     justify-content: center;
@@ -175,7 +175,7 @@ void handleRoot() {
     min-width: 140px;
   }
 
-  /* 丸ボタン */
+  /* Round buttons */
   .btn-circle {
     font-size: 1.1rem;
     padding: 0.8rem 1.6rem;
@@ -192,7 +192,7 @@ void handleRoot() {
     font-weight: bold;
   }
 
-  /* 段ごとのボタン配置 */
+  /* Button rows */
   .button-row {
     display: flex;
     flex-wrap: wrap;
@@ -211,23 +211,23 @@ void handleRoot() {
 <body>
   <h1>Flexispot Web Controller</h1>
 
-  <!-- 上段：高さ + Wakeup -->
+  <!-- Top row: height + Wakeup -->
   <div class="top-row">
     <div>
-      <div class="height-label">現在の高さ</div>
+      <div class="height-label">Current Height</div>
       <div class="height-box" id="height">--.- cm</div>
     </div>
     <button class="btn-circle btn-main" onclick="fetch('/wake')">Wakeup</button>
   </div>
 
-  <!-- 1段目：Up / Down / Memory -->
+  <!-- Row 1: Up / Down / Memory -->
   <div class="button-row">
     <button class="btn-circle" id="btnUp">▲ Up</button>
     <button class="btn-circle" id="btnDown">▼ Down</button>
     <button class="btn-circle" onclick="fetch('/mem')">Memory</button>
   </div>
 
-  <!-- 2段目：Preset1〜4 -->
+  <!-- Row 2: Preset 1–4 -->
   <div class="button-row">
     <button class="btn-circle" onclick="fetch('/pre1')">Preset 1</button>
     <button class="btn-circle" onclick="fetch('/pre2')">Preset 2</button>
@@ -235,10 +235,10 @@ void handleRoot() {
     <button class="btn-circle" onclick="fetch('/pre4')">Preset 4</button>
   </div>
 
-  <p class="note">Up/Downは押している間だけ動きます。</p>
+  <p class="note">Up/Down moves the desk only while the button is pressed.</p>
 
   <script>
-    // 高さの更新
+    // Update height display
     async function updateHeight() {
       try {
         const res = await fetch('/height');
@@ -248,7 +248,7 @@ void handleRoot() {
       } catch (e) {}
     }
 
-    // 押しっぱなし処理
+    // Hold-to-move behavior
     function setupHoldButton(btnId, startUrl, stopUrl) {
       const btn = document.getElementById(btnId);
       if (!btn) return;
@@ -304,30 +304,31 @@ void handlePre4() {
 }
 
 void handleHeight() {
-  // lastResult を文字列化
+  // Convert lastResult to String
   String h = String(lastResult);
 
-  // デスクがスリープ中などで "   " の場合は Sleeping... にする
+  // If the desk is sleeping or display is blank, show "Sleeping..."
   if (strcmp(lastResult, "   ") == 0 || lastResult[0] == '\0') {
     h = "Sleeping...";
   } else if (strcmp(lastResult, "5- ") == 0) {
+    // Example of handling a special pattern, can be adjusted as needed
     h = "S- ";
   } else {
     h += " cm";
   }
 
-  // JSONで返す
+  // Return JSON
   String json = String("{\"height\":\"") + h + "\"}";
   server.send(200, "application/json", json);
 }
 
 void handleUpStart() {
   Serial.println("HTTP: Up start");
-  // 必要なら最初に起動
+  // Ensure desk is awake
   turnon();
   upActive = true;
-  downActive = false;    // 逆方向は止める
-  lastUpSend = 0;        // すぐ送れるように
+  downActive = false;   // Stop opposite direction
+  lastUpSend = 0;       // Allow immediate send
   server.send(200, "text/plain", "Up start");
 }
 
@@ -341,7 +342,7 @@ void handleDownStart() {
   Serial.println("HTTP: Down start");
   turnon();
   downActive = true;
-  upActive = false;      // 逆方向は止める
+  upActive = false;     // Stop opposite direction
   lastDownSend = 0;
   server.send(200, "text/plain", "Down start");
 }
@@ -354,7 +355,7 @@ void handleDownStop() {
 
 void handleMem() {
   Serial.println("HTTP: Memory");
-  memory();  // ← 既存の memory() を呼ぶ
+  memory();
   server.send(200, "text/plain", "Memory command sent.");
 }
 
@@ -364,22 +365,22 @@ void handleNotFound() {
 
 void setup() {
   M5.begin();
-  M5.Display.setRotation(1);  // 横画面モードに設定
+  M5.Display.setRotation(1);  // Landscape mode
 
-  // テキストのプロパティ設定
-  M5.Display.setTextDatum(MC_DATUM);              // テキスト配置の中央基準
-  M5.Display.setTextColor(TFT_WHITE, TFT_BLACK);  // 白文字、黒背景
-  M5.Display.setTextSize(2); // 大きさ2倍
+  // Text properties
+  M5.Display.setTextDatum(MC_DATUM);              // Center-based text alignment
+  M5.Display.setTextColor(TFT_WHITE, TFT_BLACK);  // White text on black background
+  M5.Display.setTextSize(2);                      // 2x size
 
-  // 画面をクリアしてテキストを描画
+  // Initial screen
   M5.Display.fillScreen(TFT_BLACK);
   M5.Display.drawString("Flexispot Controller", M5.Display.width() / 2, M5.Display.height() / 2);
 
-  // デバッグシリアル設定
+  // Debug serial
   Serial.begin(115200);
   Serial.println("Serial Ready.");
 
-  // e2pro向けシリアル
+  // Serial for e2pro
   // Initialize Serial1 on D1 and D2
   // Format: Serial1.begin(baudrate, config, rxPin, txPin);
   Serial1.begin(9600, SERIAL_8N1, D2, D1);
@@ -389,7 +390,7 @@ void setup() {
   pinMode(D3, OUTPUT);
   digitalWrite(D3, LOW);
 
-  // ====== WiFi接続 ======
+  // ====== WiFi connection ======
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
@@ -402,15 +403,15 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  // 画面にIP表示（最初だけざっくり）
+  // Show IP address on screen (first time only, simple layout)
   M5.Display.fillScreen(TFT_BLACK);
-  M5.Display.setTextDatum(TL_DATUM); // 左上基準
+  M5.Display.setTextDatum(TL_DATUM); // Top-left origin
   M5.Display.setTextSize(2);
   M5.Display.drawString("Flexispot Controller", 0, 0);
   M5.Display.setTextSize(1);
   M5.Display.drawString("IP: " + WiFi.localIP().toString(), 0, 30);
 
-  // ====== HTTPサーバ設定 ======
+  // ====== HTTP server routes ======
   server.on("/", handleRoot);
   server.on("/wake", handleWake);
   server.on("/pre1", handlePre1);
@@ -429,13 +430,13 @@ void setup() {
 }
 
 void loop() {
-  // Webサーバ処理
+  // Handle HTTP requests
   server.handleClient();
 
-  // ボタン処理
+  // Handle M5 buttons
   M5.update();
 
-  // --- Up/Down 連続送信処理 ---
+  // --- Continuous Up/Down command sending ---
   unsigned long now = millis();
 
   if (upActive && (now - lastUpSend >= CMD_INTERVAL_MS)) {
@@ -449,22 +450,22 @@ void loop() {
   }
 
   if (M5.BtnA.wasPressed()) {
-    Serial.println("A Btn Pressed");
+    Serial.println("Button A Pressed");
     wake();
   }
   if (M5.BtnA.wasReleased()) {
-    Serial.println("A Btn Released");
+    Serial.println("Button A Released");
   }
   if (M5.BtnB.wasPressed()) {
-    Serial.println("B Btn Pressed");
+    Serial.println("Button B Pressed");
     //memory();
     pre4();
   }
   if (M5.BtnB.wasReleased()) {
-    Serial.println("B Btn Released");
+    Serial.println("Button B Released");
   }
 
-  // 受信データ処理
+  // Handle incoming status frames from desk controller
   while (Serial1.available() > 0) {
     uint8_t b = (uint8_t)Serial1.read();
 
@@ -472,15 +473,15 @@ void loop() {
       case WAIT_START:
         if (b == START_BYTE) {
           state = WAIT_LEN;
-          // デバッグ用
-          //Serial.println(F("START_BYTE 受信"));
+          // Debug:
+          // Serial.println(F("START_BYTE received"));
         }
         break;
 
       case WAIT_LEN:
         frameLen = b;
         if (frameLen == 0 || frameLen > MAX_FRAME_LEN) {
-          Serial.println(F("不正な長さ"));
+          Serial.println(F("Invalid frame length"));
           resetState();
         } else {
           frameIndex = 0;
@@ -492,9 +493,9 @@ void loop() {
       case WAIT_PAYLOAD:
         frameBuf[frameIndex++] = b;
         if (frameIndex >= frameLen) {
-          // フレームを処理
+          // Process full frame
           handleFrame();
-          // 次のフレームに備えて状態を戻す
+          // Reset for next frame
           resetState();
         }
         break;
@@ -502,7 +503,7 @@ void loop() {
   }
 }
 
-// 8bit のビット反転関数（b7..b0 -> b0..b7）
+// 8-bit bit-reverse function (b7..b0 -> b0..b7)
 uint8_t reverseBits(uint8_t x) {
   x = (x & 0xF0) >> 4 | (x & 0x0F) << 4;
   x = (x & 0xCC) >> 2 | (x & 0x33) << 2;
@@ -510,24 +511,24 @@ uint8_t reverseBits(uint8_t x) {
   return x;
 }
 
-// 7セグ＋ドットのパターンを数字に変換
-// raw : 受信した生の 8bit データ（例：0x86）
-// dot : その桁にドットが点灯しているかどうかを返す
+// Convert 7-seg pattern + dot to a digit character
+// raw : received 8-bit data (e.g. 0x86)
+// dot : will be set to true if the decimal point is on for this digit
 char segToDigit(uint8_t raw, bool &dot) {
-  // まずビット列を反転
+  // First, reverse bits
   uint8_t r = reverseBits(raw);
 
-  // 反転後の LSB(ビット0) をドットとみなす
+  // LSB (bit 0) after reversal is treated as the dot
   dot = (r & 0x01) != 0;
 
-  // ドットビットを落として、数字部分だけにする
+  // Mask out the dot bit, leave only segment bits
   uint8_t pat = r & 0xFE;
 
-  // 標準的な7セグのパターン（ビット反転後）との対応表
+  // Standard 7-seg patterns (after bit reversal)
   // 0:0xFC, 1:0x60, 2:0xDA, 3:0xF2, 4:0x66,
   // 5:0xB6, 6:0xBE, 7:0xE0, 8:0xFE, 9:0xF6
-//  Serial.print(pat);
-//  Serial.print(" ");
+  // Serial.print(pat);
+  // Serial.print(" ");
   switch (pat) {
     case 0xFC: return '0';
     case 0x60: return '1';
@@ -539,27 +540,27 @@ char segToDigit(uint8_t raw, bool &dot) {
     case 0xE0: return '7';
     case 0xFE: return '8';
     case 0xF6: return '9';
-    case 0x00: return ' '; // 非表示化のデータ。
-    case 0x02: return '-'; // ハイフン
+    case 0x00: return ' '; // Blanked digit
+    case 0x02: return '-'; // Hyphen
     case 0x1C: return 'L'; // L
     case 0x3A: return 'o'; // o
     case 0x9C: return 'C'; // C
-    default:   return '?';  // 不明なパターン
+    default:   return '?'; // Unknown pattern
   }
 }
 
-// 受信した1フレームを処理
+// Process one received frame
 void handleFrame() {
-  // 最低でも [CMD(=0x12), seg1, seg2, seg3] の4バイト必要
+  // At minimum we need [CMD(=0x12), seg1, seg2, seg3]
   if (frameLen < 4) {
-    Serial.println(F("フレーム長が足りません"));
+    Serial.println(F("Frame length too short"));
     return;
   }
 
   uint8_t cmd = frameBuf[0];
 
   if (cmd == CMD_DISPLAY) {
-    // 2,3,4バイト目を7セグデータとして処理
+    // Bytes 1,2,3 are 7-seg data
     uint8_t segBytes[3] = {
       frameBuf[1],
       frameBuf[2],
@@ -573,7 +574,7 @@ void handleFrame() {
       digits[i] = segToDigit(segBytes[i], dots[i]);
     }
 
-    // 出力用バッファ（最大 "9.99" で5文字＋終端）
+    // Output buffer (up to "9.99" = 4 chars + null)
     char result[6];
     int pos = 0;
 
@@ -585,20 +586,19 @@ void handleFrame() {
     }
     result[pos] = '\0';
 
-    Serial.print(F("表示データ: "));
-    Serial.println(result);  // 例: "1.95"
+    Serial.print(F("Display data: "));
+    Serial.println(result);  // e.g. "1.95"
 
-    // ★ 前回表示と同じなら何もしない（点滅防止）
+    // Avoid flickering: only update when the value changes
     if (strcmp(result, lastResult) != 0) {
-      // ★ 新しい値を保存
+      // Save new value
       strncpy(lastResult, result, sizeof(lastResult));
       lastResult[sizeof(lastResult) - 1] = '\0';
 
-      // ★ 画面更新（fillScreen はやめる）
-      //   背景色付きで drawString しているので、文字の周囲は上書きされます
+      // Update screen (no full clear; background color in drawString is enough)
       M5.Display.setTextDatum(MC_DATUM);
       M5.Display.setTextColor(TFT_WHITE, TFT_BLACK);
-      M5.Display.setTextFont(7); // 48ピクセル7セグ風フォント
+      M5.Display.setTextFont(7); // 48px 7-seg-like font
 
       if(strcmp(result, "   ") == 0) {
         M5.Display.fillScreen(TFT_BLACK);
@@ -612,20 +612,17 @@ void handleFrame() {
       }
     }
   } else if (cmd == CMD_SLEEP) {
-    // 必ずこのパケットが飛ぶわけではなさそう
-//    M5.Display.fillScreen(TFT_BLACK);
-      Serial.println("Clear Display");
+    // Not always sent, but indicates going to sleep
+    // M5.Display.fillScreen(TFT_BLACK);
+    Serial.println("Clear Display (Sleep)");
   } else {
-    // 今回は CMD_DISPLAY 以外は無視（必要なら他コマンドも追加）
-    //Serial.print(F("未知のコマンド: 0x"));
-    //Serial.println(cmd, HEX);
-        // CMD_DISPLAY 以外のコマンド → frameBuf をダンプ表示
+    // For now ignore non-display commands (but dump for debugging)
     Serial.print("Unknown CMD: 0x");
     Serial.println(cmd, HEX);
 
     Serial.print("Raw frame: ");
     for (int i = 0; i < frameLen; i++) {
-        if (frameBuf[i] < 16) Serial.print('0'); // 1桁のとき 0 を付ける
+        if (frameBuf[i] < 16) Serial.print('0'); // leading zero for single hex digit
         Serial.print(frameBuf[i], HEX);
         Serial.print(' ');
     }
@@ -638,5 +635,3 @@ void resetState() {
   frameLen = 0;
   frameIndex = 0;
 }
-
-
