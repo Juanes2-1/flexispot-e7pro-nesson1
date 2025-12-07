@@ -52,6 +52,7 @@ Accessible via `http://<device-ip>/`
 
 ### Supported Desk
 - **Flexispot E7 Pro**
+  - Controller Model: HS13M-1C0
 
 ### Controller Device
 - **Arduino Nesso N1** (tested & verified)
