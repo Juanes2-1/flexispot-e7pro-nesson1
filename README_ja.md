@@ -1,4 +1,4 @@
-# Flexispot Web Controller (M5Unified / Arduino Nesso N1)
+# Flexispot Web コントローラー (M5Unified / Arduino Nesso N1)
 
 ![IMG_1237](https://github.com/user-attachments/assets/2d6b620c-cdfd-4e2e-9b4c-b81906e4d92c)
 
