@@ -84,16 +84,15 @@ Serial出力と M5デバイスのディスプレイ に M5Unified 対応のIPア
 ## セットアップ
 
 1. RJ45(普通のEtherケーブル)を加工し、E5デバイスに接続します
-2. RJ45ケーブルをFlexispot デスクのコントローラに接続します
-  1. 一部のFlexispot デスクのコントローラーにはRJ45の口が2つあり、既存のコントローラーと共存できます
-3. flexispot_e7pro_nesson1.ino を Arduino IDE などで編集できるようにします
+2. RJ45ケーブルをFlexispot デスクのコントローラに接続します （一部のFlexispot デスクのコントローラーにはRJ45の口が2つあり、既存のコントローラーと共存できます）
+3. `flexispot_e7pro_nesson1.ino`を Arduino IDE などで編集できるようにします
 4. コード内の `YOUR_SSID` / `YOUR_PASSWORD` を それぞれご自分の環境の WiFi の情報に書き換えます
 5. Arduino IDE からビルドし、Arduino Nesso N1 に書き込む  
 6. シリアルモニタもしくはデバイスの画面よりIPアドレス確認
    - シリアルモニターの場合は、`WiFi connected.`  `IP address: 192.168.x.y`というメッセージが表示されます
    - 画面表示
    ![IMG_1238](https://github.com/user-attachments/assets/34019079-53df-4635-a90c-db0bb567817c)
-5. ブラウザで `http://192.168.x.y/` にアクセスすると、Web UIが表示されます。
+7. ブラウザで `http://192.168.x.y/` にアクセスすると、Web UIが表示されます。
 <img width="631" height="434" alt="image" src="https://github.com/user-attachments/assets/09dcf8de-a8dd-4a82-9209-76c9e7a2f77c" />
 
 ## 注意事項
