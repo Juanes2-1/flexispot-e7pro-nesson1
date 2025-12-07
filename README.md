@@ -1,4 +1,4 @@
-# Flexispot Web Controller (M5Unified / Arduino nesso N1)
+# Flexispot Web Controller (M5Unified / Arduino Nesso N1)
 
 ![IMG_1237](https://github.com/user-attachments/assets/2d6b620c-cdfd-4e2e-9b4c-b81906e4d92c)
 
@@ -13,7 +13,7 @@ Flexispot 製のスタンディングデスクのほとんどのモデルは、L
 
 また、デスクの高さ情報（7セグ表示の値）をシリアル経由で取得し、
 
-- M5 デバイス本体のディスプレイ
+- M5Unified 対応本体のディスプレイ
 - 同一ネットワーク内のブラウザ（Web UI）
 
 の両方に表示することもできます。
@@ -25,7 +25,7 @@ Flexispot 製のスタンディングデスクのほとんどのモデルは、L
 
 - Flexispot 昇降デスク（E7 Pro）のシリアル制御による上昇・下降操作
 
-- M5 デバイス本体のボタン操作／表示
+- M5Unified 対応本体のボタン操作／表示
   - Button A: Wakeup（デスクのコントローラを起動）
   - Button B: Preset 4（着座位置など用途に応じて変更可能）
   - ディスプレイに現在の高さを表示
@@ -71,8 +71,8 @@ Flexispot のシリアル設定は以下のようになります。
 
 ## Web UI について
 
-接続先環境のSSIDとパスワードを設定し、M5 デバイスを起動させ Wi-Fi に接続されると、HTTP サーバがポート `80` で起動します。
-Serial出力と M5デバイスのディスプレイ に M5デバイスのIPアドレスが表示されます。
+接続先環境のSSIDとパスワードを設定し、M5Unified 対応を起動させ Wi-Fi に接続されると、HTTP サーバがポート `80` で起動します。
+Serial出力と M5デバイスのディスプレイ に M5Unified 対応のIPアドレスが表示されます。
 このIPアドレスを利用して、ブラウザから `http://<デバイスのIP>/` にアクセスすると操作が可能になります。
 
 - Wakeup ボタンを押すことで、Wake状態に移行して現在の高さが表示され操作が可能になります。
