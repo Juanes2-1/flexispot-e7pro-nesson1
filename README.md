@@ -99,7 +99,7 @@ The assigned IP address is shown on:
 - the Serial Monitor  
 - the device's display  
 
-Access the controller from a browser: http://<device-ip>/
+Access the controller from a browser: http://\<device-ip\>/
 
 
 ### Web UI Functions
