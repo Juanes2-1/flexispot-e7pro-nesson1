@@ -39,7 +39,8 @@ Flexispot 製のスタンディングデスクのほとんどのモデルは、L
 
 ## ハードウェア構成
 
-- Flexispot E7 Pro 昇降デスク  
+- Flexispot E7 Pro 昇降デスク
+  - コントローラー型番: HS13M-1C0
 - M5Unified 対応デバイス  
   - **Arduino Nesso N1（動作確認済み）**
 - Flexispot E7 Pro と Arudino Nesso N1の接続
