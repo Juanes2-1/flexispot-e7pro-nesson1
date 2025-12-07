@@ -2,107 +2,155 @@
 
 ![IMG_1237](https://github.com/user-attachments/assets/2d6b620c-cdfd-4e2e-9b4c-b81906e4d92c)
 
-> [!WARNING]
-> 注意してください！電子機器の実験は危険を伴う場合があります。このガイドは自己責任でご利用ください。
+> [!WARNING]  
+> **Important:** Working with electronic devices can be dangerous.  
+> Follow this guide at your own risk.
 
-## 概要
+---
+[日本語のREADMEはこちら](README_ja.md)
 
-このプロジェクトは、Flexispot 製のスタンディングデスクをのコントローラーをエミューレーションした M5Unified 対応デバイス（Arduino nesso N1 など）から **物理ボタン** と **Web ブラウザ**の両方で操作できるようにするものです。
+## Overview
 
-Flexispot 製のスタンディングデスクのほとんどのモデルは、LoctekMotion 社のコントローラーを利用しています。このプロジェクトでは、コントロールボックスに接続するRJ45ポートからシリアル通信を行い、スタンディングデスクを M5Unified 対応デバイスから操作することができます。
+This project enables control of a Flexispot standing desk using an M5Unified-compatible device (such as the **Arduino Nesso N1**) that emulates the original desk controller.
 
-また、デスクの高さ情報（7セグ表示の値）をシリアル経由で取得し、
+Most Flexispot desks—including the **E7 Pro**—use controller boards manufactured by **LoctekMotion**.  
+This project communicates with the desk’s control box through its RJ45 port via serial communication, allowing you to operate the desk from your M5Unified device.
 
-- M5Unified 対応本体のディスプレイ
-- 同一ネットワーク内のブラウザ（Web UI）
+Additionally, the desk’s height (7-segment display output) is decoded through the serial interface and displayed on:
 
-の両方に表示することもできます。
+- the M5Unified device’s built-in display  
+- a web UI accessible on the same local network
 
+This project has been **tested only on the Arduino Nesso N1**.
 
-本プロジェクトは **Arduino Nesso N1 上でのみ動作確認済み** です。
+---
 
-## 主な機能
+## Features
 
-- Flexispot 昇降デスク（E7 Pro）のシリアル制御による上昇・下降操作
+### Desk Control via Serial Communication
+- Full up/down motion control for Flexispot E7 Pro
+- Wakeup, Memory, and Preset operations
 
-- M5Unified 対応本体のボタン操作／表示
-  - Button A: Wakeup（デスクのコントローラを起動）
-  - Button B: Preset 4（着座位置など用途に応じて変更可能）
-  - ディスプレイに現在の高さを表示
-- Web ブラウザからの操作（HTTP）／表示
-  - Wakeup （コントローラー起動／現在の高さの取得
-  - Up / Down（押している間のみ連続昇降、約 108ms 間隔で送信）
-  - Memory（cmd_mem）
-  - Preset 1 / 2 / 3 / 4
-  - 現在の高さを 1 秒ごとに自動更新
-  - スリープ時は `Sleeping...` と表示
+### Physical Controls on the M5Unified Device
+- **Button A:** Wakeup (activates the desk controller)
+- **Button B:** Preset 4 (commonly used as sitting height)
+- Live height display on device screen
 
-## ハードウェア構成
+### Web Browser Control & Monitoring
+Accessible via `http://<device-ip>/`
 
-- Flexispot E7 Pro 昇降デスク  
-- M5Unified 対応デバイス  
-  - **Arduino Nesso N1（動作確認済み）**
-- Flexispot E7 Pro と Arudino Nesso N1の接続
+- Wakeup (activate controller and read current height)
+- Up / Down (moves only while pressed; commands sent every ~108 ms)
+- Memory (cmd_mem)
+- Presets 1 / 2 / 3 / 4
+- Height auto-updates every 1 second
+- Displays `Sleeping...` when the desk is idle
 
-| Pin(RJ45) | ケーブルカラー(T-568B) | 説明 | Nesso N1 の接続ポート |
-| --- | --- | --- | --- |
-| 1	| White Orange | - | - |	
-| 2	| Orange | - | - |
-| 3	| White Green |	- | - |
-| 4	| Blue | 1秒間 HIGH にするとコントローラが Wakeup（動作モード遷移）| D3 |
-| 5	| White Blue |	RX (of remote) | D2 |
-| 6	| Green |	TX (of remote)	| D1 |
-| 7	| White Brown |	GND	|GND |
-| 8	| Brown |	VDD (5V) |	VIN |
+---
+
+## Hardware Configuration
+
+### Supported Desk
+- **Flexispot E7 Pro**
+
+### Controller Device
+- **Arduino Nesso N1** (tested & verified)
+
+### Connection Between Flexispot E7 Pro and Arduino Nesso N1
+
+| RJ45 Pin | Cable Color (T-568B) | Description | Nesso N1 Pin |
+|---------|-----------------------|-------------|--------------|
+| 1 | White Orange | - | - |
+| 2 | Orange | - | - |
+| 3 | White Green | - | - |
+| 4 | Blue | Set HIGH for 1 second to wake controller | D3 |
+| 5 | White Blue | RX (from remote) | D2 |
+| 6 | Green | TX (to remote) | D1 |
+| 7 | White Brown | GND | GND |
+| 8 | Brown | VDD (5V) | VIN |
 
 ![wiring](https://github.com/user-attachments/assets/2cc1f20f-4027-4ce3-8875-643718602d34)
 
-## ソフトウェア設定
-Flexispot のシリアル設定は以下のようになります。
-- ボーレート: 9600 bps
-- データビット: 8
-- ストップビット: 1
-- パリティ: なし
+---
 
-設定は以下のようにしてください。
+## Serial Communication Settings
+
+Flexispot / LoctekMotion controller uses:
+
+- **Baud rate:** 9600 bps  
+- **Data bits:** 8  
+- **Stop bits:** 1  
+- **Parity:** none  
+
+Use the following configuration:
+
+```cpp
+Serial1.begin(9600, SERIAL_8N1, D2, D1);
 ```
- Serial1.begin(9600, SERIAL_8N1, D2, D1);
+
+## Web UI
+
+Once the Wi-Fi SSID and password are configured in the code and the device is powered on,  
+the M5Unified device will connect to Wi-Fi and start an HTTP server on port **80**.
+
+The assigned IP address is shown on:
+
+- the Serial Monitor  
+- the device's display  
+
+Access the controller from a browser: http://<device-ip>/
+
+
+### Web UI Functions
+
+- **Wakeup**  
+  Activates the controller and enables height monitoring.
+
+- **Height Display**  
+  Updated once per second.
+
+- **Up / Down**  
+  Moves only while the button is held (press-and-hold behavior).
+
+- **Memory**  
+  Press once to enter memory-set mode.  
+  Then press a preset button to store the current height.
+
+- **Preset 1–4**  
+  Moves desk to the stored height.
+
+---
+
+## Setup Instructions
+
+1. Prepare and modify a standard RJ45 (Ethernet) cable.  
+2. Connect the cable to the Flexispot controller box. (Some Flexispot models have **two RJ45 ports**, allowing coexistence with the original remote.)
+3. Open `flexispot_e7pro_nesson1.ino` in Arduino IDE.
+4. Update Wi-Fi credentials:
+```cpp
+   const char* ssid = "YOUR_SSID";
+   const char* password = "YOUR_PASSWORD";
 ```
-
-## Web UI について
-
-接続先環境のSSIDとパスワードを設定し、M5Unified 対応を起動させ Wi-Fi に接続されると、HTTP サーバがポート `80` で起動します。
-Serial出力と M5デバイスのディスプレイ に M5Unified 対応のIPアドレスが表示されます。
-このIPアドレスを利用して、ブラウザから `http://<デバイスのIP>/` にアクセスすると操作が可能になります。
-
-- Wakeup ボタンを押すことで、Wake状態に移行して現在の高さが表示され操作が可能になります。
-- Wake時は現在の高さが表示されます。
-- Up/Down は押している間だけ動作します。
-- Memory は、一度押すとプリセット設定状態に移行します。この状態でプリセットボタンを押すと、現在のテーブルの高さが記憶されます。
-- Preset 1〜4 は、押すことで設定された高さに移動します。
-
-## セットアップ
-
-1. RJ45(普通のEtherケーブル)を加工し、E5デバイスに接続します
-2. RJ45ケーブルをFlexispot デスクのコントローラに接続します
-  1. 一部のFlexispot デスクのコントローラーにはRJ45の口が2つあり、既存のコントローラーと共存できます
-3. flexispot_e7pro_nesson1.ino を Arduino IDE などで編集できるようにします
-4. コード内の `YOUR_SSID` / `YOUR_PASSWORD` を それぞれご自分の環境の WiFi の情報に書き換えます
-5. Arduino IDE からビルドし、Arduino Nesso N1 に書き込む  
-6. シリアルモニタもしくはデバイスの画面よりIPアドレス確認
-   - シリアルモニターの場合は、`WiFi connected.`  `IP address: 192.168.x.y`というメッセージが表示されます
-   - 画面表示
-   ![IMG_1238](https://github.com/user-attachments/assets/34019079-53df-4635-a90c-db0bb567817c)
-5. ブラウザで `http://192.168.x.y/` にアクセスすると、Web UIが表示されます。
+5. Build and upload the firmware to the Arduino Nesso N1.
+6. Check the assigned IP address (Serial Monitor or device screen):
+  - Example:
+```
+WiFi connected.
+IP address: 192.168.x.y
+```
+  - Device screen:
+![IMG_1238](https://github.com/user-attachments/assets/34019079-53df-4635-a90c-db0bb567817c)
+7. Open the Web UI:
+```
+http://192.168.x.y/
+```
 <img width="631" height="434" alt="image" src="https://github.com/user-attachments/assets/09dcf8de-a8dd-4a82-9209-76c9e7a2f77c" />
 
-## 注意事項
+## Caution
+- This is an unofficial, hobby-grade project, not affiliated with Flexispot or LoctekMotion.
+- Be especially careful with wiring. Use a multimeter to verify correct voltage levels before connecting to the desk.
+- Ensure no objects or people are under the desk while it is moving. Use entirely at your own risk.
 
-- 本プロジェクトは **非公式の個人開発コード** です。  
-  Flexispot 等による公式サポートはありません。
-- 配線ミスには特に注意ください。配線時には必ずテスターで適切な電圧が流れているかを確認してください。
-- 昇降時は周囲に物体や人体がないことを確認し、自己責任で使用してください。
+## License
 
-## ライセンス
-
-本プロジェクトは **MIT License** で公開されています。
+This project is released under the MIT License.
