@@ -1,5 +1,6 @@
 # Flexispot Web Controller (M5Unified / Arduino nesso N1)
 
+![IMG_1237](https://github.com/user-attachments/assets/2d6b620c-cdfd-4e2e-9b4c-b81906e4d92c)
 
 > [!WARNING]
 > 注意してください！電子機器の実験は危険を伴う場合があります。このガイドは自己責任でご利用ください。
@@ -43,7 +44,6 @@ Flexispot 製のスタンディングデスクのほとんどのモデルは、L
   - **Arduino Nesso N1（動作確認済み）**
 - Flexispot E7 Pro と Arudino Nesso N1の接続
 
-
 | Pin(RJ45) | ケーブルカラー(T-568B) | 説明 | Nesso N1 の接続ポート |
 | --- | --- | --- | --- |
 | 1	| White Orange | - | - |	
@@ -54,6 +54,8 @@ Flexispot 製のスタンディングデスクのほとんどのモデルは、L
 | 6	| Green |	TX (of remote)	| D1 |
 | 7	| White Brown |	GND	|GND |
 | 8	| Brown |	VDD (5V) |	VIN |
+
+![wiring](https://github.com/user-attachments/assets/2cc1f20f-4027-4ce3-8875-643718602d34)
 
 ## ソフトウェア設定
 Flexispot のシリアル設定は以下のようになります。
@@ -88,9 +90,11 @@ Serial出力と M5デバイスのディスプレイ に M5デバイスのIPア�
 4. コード内の `YOUR_SSID` / `YOUR_PASSWORD` を それぞれご自分の環境の WiFi の情報に書き換えます
 5. Arduino IDE からビルドし、Arduino Nesso N1 に書き込む  
 6. シリアルモニタもしくはデバイスの画面よりIPアドレス確認
-   - `WiFi connected.`  
-   - `IP address: 192.168.x.y`  
-5. ブラウザで `http://192.168.x.y/` にアクセス
+   - シリアルモニターの場合は、`WiFi connected.`  `IP address: 192.168.x.y`というメッセージが表示されます
+   - 画面表示
+   ![IMG_1238](https://github.com/user-attachments/assets/34019079-53df-4635-a90c-db0bb567817c)
+5. ブラウザで `http://192.168.x.y/` にアクセスすると、Web UIが表示されます。
+<img width="631" height="434" alt="image" src="https://github.com/user-attachments/assets/09dcf8de-a8dd-4a82-9209-76c9e7a2f77c" />
 
 ## 注意事項
 
